@@ -1,0 +1,20 @@
+Target: 
+Summary: The web application is built using Salesforce. Salesforce is a CRM for developing web applications providing a number of abstractions to simplify the development of data-driven applications. In particular, the Aura framework enables developers to build applications using reusable components exposing an API in order for the components to interact with the application.
+During testing it, I was discovered that the Salesforce instance doesnt check permissions on the Article_kav custom object for unauthenticated Guest users and returning to big amount article with large content-length.
+Affected Parameter(s): "message"
+
+##Steps to Reproduce/POC
+1. Open the burp suite or owasp zip proxy.
+2. Navigate to this url with your proxy browser: "https://help.glassdoor.com"
+3. Send to any "POST /s/sfsites/aura?" request to repeater
+4. Delete the message parameter payload and write this payload:
+Code 366 BytesPretty print: off Wrap lines Copy Download
+{"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.lists.selectableListDataProvider.SelectableListDataProviderController/ACTION$getItems","callingDescriptor":"UNKNOWN","params":{"entityNameOrId":"***","layoutType":"FULL","pageSize":250,"currentPage":0,"useTimeout":false,"getCount":false,"enableRowActions":false}}]} 
+
+
+5. After send the payload and observe the returning big data.
+
+
+Impact
+The Salesforce instance does not enforce sufficient authorization checks when specific objects are requested. As such, an unauthenticated attacker 
+may be able to extract sensitive data from the records in these objects which contains information of other users. This includes internal information/meetings.
